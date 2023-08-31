@@ -1,0 +1,72 @@
+### Get all users from empty db
+GET http://localhost:8080/api/v1/users
+
+
+### Create user with ID 1 in db
+POST http://localhost:8080/api/v1/users
+
+{
+  "firstname": "Ivan",
+  "lastname": "Ivan",
+  "username": "ivan@ivan"
+}
+
+
+### Get all info about user with id 1
+GET http://localhost:8080/api/v1/users/1
+
+
+
+### Create segment AVITO_DISCOUNT
+POST http://localhost:8080/api/v1/segments
+
+{
+  "name": "AVITO_DISCOUNT"
+}
+
+
+
+### Create segment AVITO_VOICE_MESSAGES
+POST http://localhost:8080/api/v1/segments
+
+{
+  "name": "AVITO_VOICE_MESSAGES"
+}
+
+
+
+### Create segment AVITO_PERFORMANCE_VAS
+POST http://localhost:8080/api/v1/segments
+
+{
+  "name": "AVITO_PERFORMANCE_VAS"
+}
+
+
+### List all segments
+GET http://localhost:8080/api/v1/segments
+
+
+
+### Put user with id 1 into segment AVITO_DISCOUNT
+PUT http://localhost:8080/api/v1/segments/AVITO_DISCOUNT/users/1
+
+
+### Get all info about user with id 1
+GET http://localhost:8080/api/v1/users/1
+
+
+### List all info about segment AVITO_DISCOUNT
+GET http://localhost:8080/api/v1/segments/AVITO_DISCOUNT
+
+
+### Put user with 1 to list of segments and remove this user from list of segments
+PUT http://localhost:8080/api/v1/users/1/segments
+
+{
+  "segments_to_add": ["AVITO_PERFORMANCE_VAS", "AVITO_VOICE_MESSAGES"],
+  "segments_to_remove": ["AVITO_DISCOUNT"]
+}
+
+### Get all info about user with id 1
+GET http://localhost:8080/api/v1/users/1

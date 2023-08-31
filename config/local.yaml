@@ -1,0 +1,16 @@
+env: local
+
+application:
+  name: segment-service
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  pass: postgres
+  db-name: postgres
+
+server:
+  port: 8080
+  timeout: 2s
+  idle-timeout: 60s

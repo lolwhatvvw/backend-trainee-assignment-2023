@@ -2,6 +2,21 @@ version: "3.9"
 
 services:
 
+  segment:
+    container_name: segment-service
+    depends_on:
+      wait-for-postgres:
+        condition: service_completed_successfully
+    build: .
+    env_file: .env
+    ports:
+      - "8080:8080"
+
+
+  wait-for-postgres:
+    image: atkrad/wait4x
+    command: postgresql 'postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable'
+
   postgres:
     container_name: postgres
     restart: unless-stopped
@@ -11,6 +26,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      - ./postgres/schema.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./schema/schema.sql:/docker-entrypoint-initdb.d/1-init.sql
     ports:
-      - "54320:5432"
+      - "5432:5432"

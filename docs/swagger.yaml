@@ -1,0 +1,465 @@
+definitions:
+  handler.CreateSegmentRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  handler.CreateUserRequest:
+    properties:
+      firstname:
+        type: string
+      lastname:
+        type: string
+      username:
+        type: string
+    required:
+    - firstname
+    - lastname
+    - username
+    type: object
+  handler.ErrorResponse:
+    properties:
+      code:
+        description: application-specific error code
+        example: 404
+        type: integer
+      error:
+        description: application-level error message, for debugging
+        example: The requested resource was not found on the server
+        type: string
+      status:
+        description: user-level status message
+        example: Resource not found.
+        type: string
+    type: object
+  handler.updateUserSegments:
+    properties:
+      segments_to_add:
+        items:
+          type: string
+        type: array
+      segments_to_remove:
+        items:
+          type: string
+        type: array
+    type: object
+  models.Segment:
+    properties:
+      name:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.User:
+    properties:
+      firstname:
+        type: string
+      id:
+        type: integer
+      lastname:
+        type: string
+      segments:
+        items:
+          $ref: '#/definitions/models.Segment'
+        type: array
+      username:
+        type: string
+    required:
+    - firstname
+    - lastname
+    - segments
+    - username
+    type: object
+info:
+  contact: {}
+  title: Segment service API
+  version: "1.0"
+paths:
+  /api/v1/segments:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of all segments in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Segment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: List all segments
+      tags:
+      - segments
+    post:
+      consumes:
+      - application/json
+      description: Creates a new segment in the system
+      parameters:
+      - description: The segment to create
+        in: body
+        name: segment
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateSegmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Segment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Create a new segment
+      tags:
+      - segments
+  /api/v1/segments/{slug}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing segment by slug
+      parameters:
+      - description: Slug of the segment to delete
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Delete a segment
+      tags:
+      - segments
+    get:
+      consumes:
+      - application/json
+      description: Returns a single segment by slug
+      parameters:
+      - description: Slug of the segment to retrieve
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Segment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get a segment
+      tags:
+      - segments
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing segment by slug
+      parameters:
+      - description: Slug of the segment to update
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: The segment data to update
+        in: body
+        name: segment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Segment'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Update a segment
+      tags:
+      - segments
+  /api/v1/segments/{slug}/users:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of all users in the specified segment
+      parameters:
+      - description: Slug of the segment to retrieve users for
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: List all users in a segment
+      tags:
+      - segments
+  /api/v1/segments/{slug}/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a user from the specified segment
+      parameters:
+      - description: Slug of the segment to remove the user from
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: ID of the user to remove from the segment
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Remove a user from a segment
+      tags:
+      - segments
+    put:
+      consumes:
+      - application/json
+      description: Adds a user to the specified segment
+      parameters:
+      - description: Slug of the segment to add the user to
+        in: path
+        name: slug
+        required: true
+        type: string
+      - description: ID of the user to add to the segment
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Add a user to a segment
+      tags:
+      - segments
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of all users in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user in the system
+      parameters:
+      - description: The user to create
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Create a new user
+      tags:
+      - users
+  /api/v1/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing user by ID
+      parameters:
+      - description: ID of the user to delete
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Returns a single user by ID
+      parameters:
+      - description: ID of the user to retrieve
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get a user
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing user by ID
+      parameters:
+      - description: ID of the user to update
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The user data to update
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Update a user
+      tags:
+      - users
+  /api/v1/users/{id}/segments:
+    put:
+      consumes:
+      - application/json
+      description: Updates the segments of an existing user by ID
+      parameters:
+      - description: ID of the user to update segments for
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: The segments to add or remove
+        in: body
+        name: update
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateUserSegments'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Update the segments of a user
+      tags:
+      - users
+swagger: "2.0"
